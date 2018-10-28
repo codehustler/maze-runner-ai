@@ -6,7 +6,7 @@ public class Main {
 	
 	public static void main(String[] args) throws Exception {
 		RunnerGame game = new RunnerGame();
-		game.setPlayerFactory(new AIPlayerFactory(10));
+		game.setPlayerFactory(new AIPlayerFactory(20));
 		game.run();
 	}
 }

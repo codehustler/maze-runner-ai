@@ -31,7 +31,8 @@ public class AIPlayer implements Player {
 
 	private double score = 0;
 	private NeuralNetwork<BackPropagation> model;	
-	private double distortionRate = 10;
+	private double distortionRate = 1;
+	private Result result;
 
 
 	public AIPlayer() {
@@ -52,7 +53,7 @@ public class AIPlayer implements Player {
 	}
 	
 	private MultiLayerPerceptron createBasicModel() {
-		int[] layerConfig = new int[] { MazeRunner.FIELD_OF_VIEW_ANGLES.length*2+1, 8, 16, 32, 8, 2 };		
+		int[] layerConfig = new int[] { MazeRunner.FIELD_OF_VIEW_ANGLES.length*2+1, 8, 2 };		
 		MultiLayerPerceptron model = new MultiLayerPerceptron(TransferFunctionType.LINEAR, layerConfig);
 		return model;
 	}
@@ -80,7 +81,7 @@ public class AIPlayer implements Player {
 		model.calculate();
 
 		double[] output = model.getOutput();
-		double threshold = 0.002;
+		double threshold = 0.02;
 		double rel = output[0]/output[1];
 //		System.out.println(output[0] +" --------------- " + output[1] + " --------------- " + rel);
 

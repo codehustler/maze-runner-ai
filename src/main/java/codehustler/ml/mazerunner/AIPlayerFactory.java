@@ -7,9 +7,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import lombok.RequiredArgsConstructor;
+import codehustler.ml.mazerunner.Player.Result;
 
-@RequiredArgsConstructor
 public class AIPlayerFactory implements PlayerFactory {
 	
 	private static final Random R = new Random(System.currentTimeMillis()); 
@@ -17,6 +16,12 @@ public class AIPlayerFactory implements PlayerFactory {
 	private final int populationSize;
 	
 	private Set<Player> previousGeneration = new HashSet<>();
+	private SortedBuffer<Player> completionists;
+	
+	public AIPlayerFactory(int populationSize) {
+		this.populationSize = populationSize;
+		this.completionists = new SortedBuffer<>(populationSize);
+	}
 
 
 	public Player createAIPlayer(AIPlayer player) {
@@ -26,9 +31,19 @@ public class AIPlayerFactory implements PlayerFactory {
 	public Set<Player> createPlayers() {
 		Set<Player> players = new HashSet<>();
 		
-		int playersToKeep = (int) (previousGeneration.size() * 0.2d);
-		int playersToBreed = (int) (previousGeneration.size() * 0.8d);
+		int playersToKeep = (int) (previousGeneration.size() * 0.4d);
+		int playersToBreed = (int) (previousGeneration.size() * 1d);
 		int newRandomPlayers = (int) (populationSize-(playersToKeep+playersToBreed));
+		
+		if ( completionists.get().size() == populationSize ) {
+			System.out.println("Game ready, only running winners!");
+			players.addAll(completionists.get());
+			
+			return players;
+		}
+		
+		previousGeneration.stream().filter(p-> p.getResult() == Result.COMPLETED).forEach(completionists::add);
+		
 
 		List<Player> survivors = previousGeneration.stream().sorted()
 				.skip(populationSize  - playersToKeep).collect(Collectors.toList());
@@ -48,7 +63,7 @@ public class AIPlayerFactory implements PlayerFactory {
 			p.setScore(0);
 		});
 
-		players.addAll(survivors);
+		//players.addAll(survivors);
 		players.addAll(newBorns);
 		players.addAll(newRandoms);
 
